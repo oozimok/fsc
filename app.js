@@ -16,75 +16,89 @@ const myBinaryFile1 = new BinaryFile('FSC_NU85056_0120007C_werk_703.fsc', 'r');
     }
 })();
 
-const myBinaryFile2 = new BinaryFile('FSC_NU85056_0120007C_marketing_703.fsc', 'r');
+const myBinaryFile1_1 = new BinaryFile('FSC_NU85056_0120007C_werk_fscs_id_1027.fsc', 'r');
 (async function () {
     try {
-        await myBinaryFile2.open();
+        await myBinaryFile1_1.open();
 
-        await parse(myBinaryFile2, log('marketing', 10));
+        await parse(myBinaryFile1_1, log('werk 1', 10));
 
-        await myBinaryFile2.close();
+        await myBinaryFile1_1.close();
 
     } catch (err) {
         console.log(`There was an error: ${err}`);
     }
 })();
-
-const myBinaryFile3 = new BinaryFile('FSC_NU85056_0120007C_kundle_703.fsc', 'r');
-(async function () {
-    try {
-        await myBinaryFile3.open();
-
-        await parse(myBinaryFile3, log('kundle 0', 10));
-
-        await myBinaryFile3.close();
-
-    } catch (err) {
-        console.log(`There was an error: ${err}`);
-    }
-})();
-
-const myBinaryFile3_1 = new BinaryFile('FSC_NU85056_0120007C_kundle_703_fgn_lang.fsc', 'r');
-(async function () {
-    try {
-        await myBinaryFile3_1.open();
-
-        await parse(myBinaryFile3_1, log('kundle 1', 10));
-
-        await myBinaryFile3_1.close();
-
-    } catch (err) {
-        console.log(`There was an error: ${err}`);
-    }
-})();
-
-const myBinaryFile3_2 = new BinaryFile('FSC_NU85056_0120007C_kundle_703_keine_indiv.fsc', 'r');
-(async function () {
-    try {
-        await myBinaryFile3_2.open();
-
-        await parse(myBinaryFile3_2, log('kundle 2', 10));
-
-        await myBinaryFile3_2.close();
-
-    } catch (err) {
-        console.log(`There was an error: ${err}`);
-    }
-})();
-
-const myBinaryFile4 = new BinaryFile('FSC_NU85056_0120007C_vertrieb_703.fsc', 'r');
-(async function () {
-    try {
-        await myBinaryFile4.open();
-
-        await parse(myBinaryFile4, log('vertrieb', 10));
-
-        await myBinaryFile4.close();
-
-    } catch (err) {
-        console.log(`There was an error: ${err}`);
-    }
-})();
+//
+// const myBinaryFile2 = new BinaryFile('FSC_NU85056_0120007C_marketing_703.fsc', 'r');
+// (async function () {
+//     try {
+//         await myBinaryFile2.open();
+//
+//         await parse(myBinaryFile2, log('marketing', 10));
+//
+//         await myBinaryFile2.close();
+//
+//     } catch (err) {
+//         console.log(`There was an error: ${err}`);
+//     }
+// })();
+//
+// const myBinaryFile3 = new BinaryFile('FSC_NU85056_0120007C_kundle_703.fsc', 'r');
+// (async function () {
+//     try {
+//         await myBinaryFile3.open();
+//
+//         await parse(myBinaryFile3, log('kundle 0', 10));
+//
+//         await myBinaryFile3.close();
+//
+//     } catch (err) {
+//         console.log(`There was an error: ${err}`);
+//     }
+// })();
+//
+// const myBinaryFile3_1 = new BinaryFile('FSC_NU85056_0120007C_kundle_703_fgn_lang.fsc', 'r');
+// (async function () {
+//     try {
+//         await myBinaryFile3_1.open();
+//
+//         await parse(myBinaryFile3_1, log('kundle 1', 10));
+//
+//         await myBinaryFile3_1.close();
+//
+//     } catch (err) {
+//         console.log(`There was an error: ${err}`);
+//     }
+// })();
+//
+// const myBinaryFile3_2 = new BinaryFile('FSC_NU85056_0120007C_kundle_703_keine_indiv.fsc', 'r');
+// (async function () {
+//     try {
+//         await myBinaryFile3_2.open();
+//
+//         await parse(myBinaryFile3_2, log('kundle 2', 10));
+//
+//         await myBinaryFile3_2.close();
+//
+//     } catch (err) {
+//         console.log(`There was an error: ${err}`);
+//     }
+// })();
+//
+// const myBinaryFile4 = new BinaryFile('FSC_NU85056_0120007C_vertrieb_703.fsc', 'r');
+// (async function () {
+//     try {
+//         await myBinaryFile4.open();
+//
+//         await parse(myBinaryFile4, log('vertrieb', 10));
+//
+//         await myBinaryFile4.close();
+//
+//     } catch (err) {
+//         console.log(`There was an error: ${err}`);
+//     }
+// })();
 
 let parse = async function(binary, log) {
     let position = 0;
@@ -168,22 +182,26 @@ let parse = async function(binary, log) {
     switch(indivMerkmType) {
         case 0:
             log(position, 'indivMerkmType',  'keine_indiv');
-            position += 12;
+            position += 10;
             break;
         case 1:
             log(position, 'indivMerkmType',  'FGN_kurz');
             log(position, 'fgnKurz',  await binary.readString(8, position));
-            position += 19;
+            position += 17;
             break;
         case 2:
             log(position, 'indivMerkmType',  'FGN_lang');
             log(position, 'fgnKurz',  await binary.readString(8, position));
-            position += 19;
+            position += 17;
             break;
         default:
             log(position, 'indivMerkmType', `unknown = ${indivMerkmType}`);
             process.exit();
     }
+
+    const fscsId = await binary.readUInt16(position);
+    log(position, 'fscsId', fscsId);
+    position += 2;
 
     const date = await binary.readString(13, position);
     log(position, 'date', date);
