@@ -35,9 +35,37 @@ const myBinaryFile3 = new BinaryFile('FSC_NU85056_0120007C_kundle_703.fsc', 'r')
     try {
         await myBinaryFile3.open();
 
-        await parse(myBinaryFile3, log('kundle', 10));
+        await parse(myBinaryFile3, log('kundle 0', 10));
 
         await myBinaryFile3.close();
+
+    } catch (err) {
+        console.log(`There was an error: ${err}`);
+    }
+})();
+
+const myBinaryFile3_1 = new BinaryFile('FSC_NU85056_0120007C_kundle_703_fgn_lang.fsc', 'r');
+(async function () {
+    try {
+        await myBinaryFile3_1.open();
+
+        await parse(myBinaryFile3_1, log('kundle 1', 10));
+
+        await myBinaryFile3_1.close();
+
+    } catch (err) {
+        console.log(`There was an error: ${err}`);
+    }
+})();
+
+const myBinaryFile3_2 = new BinaryFile('FSC_NU85056_0120007C_kundle_703_keine_indiv.fsc', 'r');
+(async function () {
+    try {
+        await myBinaryFile3_2.open();
+
+        await parse(myBinaryFile3_2, log('kundle 2', 10));
+
+        await myBinaryFile3_2.close();
 
     } catch (err) {
         console.log(`There was an error: ${err}`);
@@ -103,53 +131,62 @@ let parse = async function(binary, log) {
     log(position, 'bestellNr', bestellNr);
     position += 7;
 
-    const requesterAlgorism = await binary.readUInt8(position);
-    switch(requesterAlgorism) {
+    const requesterAlgorithm = await binary.readUInt8(position);
+    switch(requesterAlgorithm) {
         case 0:
             position += 2;
             log(position, 'requesterId', await binary.readUInt16(position));
             log(position, 'requesterTyp', 'Marketing');
+            position += 2;
             break;
         case 2:
             log(position, 'requesterId', await binary.readUInt16(position));
             log(position, 'requesterTyp', 'Werk');
+            position += 2;
             break;
         case 32:
             position += 1;
-            const requesterAlgorismTwo = await binary.readUInt8(position);
-            if (requesterAlgorismTwo === 32) {
+            const requesterAlgorithmTwo = await binary.readUInt8(position);
+            if (requesterAlgorithmTwo === 32) {
                 position += 1;
-                log(position, 'requesterId', await binary.readString(4, position));
+                log(position, 'requesterId', await binary.readString(3, position));
                 log(position, 'requesterTyp', 'Vertrieb');
-                position += 4;
+                position += 3;
             } else {
-                log(position, 'requesterId', await binary.readString(4, position));
+                log(position, 'requesterId', await binary.readString(3, position));
                 log(position, 'requesterTyp', 'Kundle');
-                position += 4;
+                position += 3;
             }
             break;
         default:
-            log(position, 'requesterAlgorism', requesterAlgorism);
+            log(position, 'requesterAlgorithm', `unknown = ${requesterAlgorithm}`);
             process.exit();
     }
 
-    // const indivMerkmType = await binary.readUInt8(position);
-    // switch(indivMerkmType) {
-    //     case 0: console.log(`(${position}) IndivMerkmType (${indivMerkmType}): keine_indiv`); position += 1; break;
-    //     case 1: console.log(`(${position}) IndivMerkmType (${indivMerkmType}): FGN_kurz`); position += 1; break;
-    //     case 2: console.log(`(${position}) IndivMerkmType (${indivMerkmType}): FGN_lang`); position += 1; break;
-    //     default: console.log(`(${position}) IndivMerkmType (${indivMerkmType}): undefined\nEXIT`); process.exit(); break;
-    // }
-    //
-    // const fgnKurz = await binary.readString(8, position);
-    // console.log(`(${position}) fgnKurz: ${fgnKurz}`);
-    // position += 8;
-    //
-    // position += 11;
-    // // --
-    //
-    // const date = await binary.readString(13, position);
-    // console.log(`(${position}) date: ${date}`);
+    const indivMerkmType = await binary.readUInt8(position);
+    position += 1;
+    switch(indivMerkmType) {
+        case 0:
+            log(position, 'indivMerkmType',  'keine_indiv');
+            position += 12;
+            break;
+        case 1:
+            log(position, 'indivMerkmType',  'FGN_kurz');
+            log(position, 'fgnKurz',  await binary.readString(8, position));
+            position += 19;
+            break;
+        case 2:
+            log(position, 'indivMerkmType',  'FGN_lang');
+            log(position, 'fgnKurz',  await binary.readString(8, position));
+            position += 19;
+            break;
+        default:
+            log(position, 'indivMerkmType', `unknown = ${indivMerkmType}`);
+            process.exit();
+    }
+
+    const date = await binary.readString(13, position);
+    log(position, 'date', date);
 }
 
 let log = function(prefix = 'Log:', length = 4) {
