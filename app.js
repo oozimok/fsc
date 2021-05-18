@@ -100,7 +100,7 @@ const myBinaryFile1_1 = new BinaryFile('FSC_NU85056_0120007C_werk_fscs_id_1027.f
 //     }
 // })();
 
-let parse = async function(binary, log) {
+let parse = async (binary, log) => {
     let position = 0;
 
     // for(let i = 0; i < 100; i++) {
@@ -115,8 +115,6 @@ let parse = async function(binary, log) {
     //         log(i, '=', value2);
     //     }
     // }
-
-
 
     const version = await binary.readUInt8(position);
     log(position, 'version', version);
@@ -204,10 +202,10 @@ let parse = async function(binary, log) {
     position += 2;
 
     const date = await binary.readString(13, position);
-    log(position, 'date', date);
-}
+    log(position, 'date', datetime(date).toUTCString());
+};
 
-let log = function(prefix = 'Log:', length = 4) {
+let log = (prefix = 'Log:', length = 4) => {
     return function(position, key, value) {
         console.log(`${pad(prefix, length)} (${position}) ${key}: ${value}`);
     }
@@ -219,4 +217,18 @@ let log = function(prefix = 'Log:', length = 4) {
         }
         return str;
     }
-}
+};
+
+const datetime = (dateString) => {
+    // YYYYMMDDhhmmZ
+    let reggie = /(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})Z/;
+    let dateArray = reggie.exec(dateString);
+    return new Date(
+        (+dateArray[1]),
+        (+dateArray[2])-1, // Careful, month starts at 0!
+        (+dateArray[3]),
+        (+dateArray[4]),
+        (+dateArray[5]),
+        0
+    );
+};
