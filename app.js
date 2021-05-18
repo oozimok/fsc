@@ -44,6 +44,20 @@ const BinaryFile = require('binary-file');
 //     }
 // })();
 //
+const FSC_BB81798_0120007C = new BinaryFile('files/FSC_BB81798_0120007C.fsc', 'r');
+(async function () {
+    try {
+        await FSC_BB81798_0120007C.open();
+
+        await parse(FSC_BB81798_0120007C, log('FSC_BB81798_0120007C', 25));
+
+        await FSC_BB81798_0120007C.close();
+
+    } catch (err) {
+        console.log(`There was an error: ${err}`);
+    }
+})();
+//
 // const myBinaryFile1 = new BinaryFile('files/FSC_NU85056_0120007C_werk_703.fsc', 'r');
 // (async function () {
 //     try {
@@ -114,19 +128,19 @@ const BinaryFile = require('binary-file');
 //     }
 // })();
 
-const myBinaryFile1_5 = new BinaryFile('files/FSC_NU85056_0120007C_werk_703_grouppe_un_ki_be_ab_ze_ze.fsc', 'r');
-(async function () {
-    try {
-        await myBinaryFile1_5.open();
-
-        await parse(myBinaryFile1_5, log('werk 5', 25));
-
-        await myBinaryFile1_5.close();
-
-    } catch (err) {
-        console.log(`There was an error: ${err}`);
-    }
-})();
+// const myBinaryFile1_5 = new BinaryFile('files/FSC_NU85056_0120007C_werk_703_grouppe_un_ki_be_ab_ze_ze.fsc', 'r');
+// (async function () {
+//     try {
+//         await myBinaryFile1_5.open();
+//
+//         await parse(myBinaryFile1_5, log('werk 5', 25));
+//
+//         await myBinaryFile1_5.close();
+//
+//     } catch (err) {
+//         console.log(`There was an error: ${err}`);
+//     }
+// })();
 //
 // const myBinaryFile2 = new BinaryFile('files/FSC_NU85056_0120007C_marketing_703.fsc', 'r');
 // (async function () {
@@ -241,7 +255,6 @@ let parse = async (binary, log) => {
     log(position, 'bestellNr', bestellNr);
     position += 7;
 
-
     const requesterAlgorithm = await binary.readUInt8(position);
     //log(position, 'requesterAlgorithm', requesterAlgorithm);
     position += 1;
@@ -314,8 +327,7 @@ let parse = async (binary, log) => {
     position += 2;
 
     const date = await binary.readString(13, position);
-    log(position, 'date', date);
-    // log(position, 'date', datetime(date).toUTCString());
+    log(position, 'date', datetime(date).toUTCString());
 };
 
 let item = async (binary, position, log) => {
